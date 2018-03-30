@@ -19,8 +19,8 @@ function setUserInfo(request) {
 };
 
 exports.register = function (req, res) {
-    const email = req.body.user;
-    const password = req.body.password;
+    let email = req.body.user,
+        password = req.body.password;
 
     // Return error if no user provided
     if (!email) {
@@ -34,7 +34,7 @@ exports.register = function (req, res) {
 
     User.findOne({ email: email }, function (err, existingUser) {
         if (err) {
-            res.send(400).json({ "error": err });
+            res.staus(400).send({ "error": err });
         }
         // If user is not unique, return error
         if (existingUser) {
@@ -49,7 +49,7 @@ exports.register = function (req, res) {
 
         newUser.save(function (err, user) {
             if (err) {
-                return res.send(400).json({ "error": err });
+                return res.status(400).send({ "error": err });
             }
             let userInfo = setUserInfo(user);
             return res.status(201).json({
@@ -70,7 +70,7 @@ exports.login = function (req, res) {
         } else if (user) {
             user.comparePassword(req.body.password, (err, isMatch) => {
                 if (!isMatch) {
-                    return res.status(401).json({ message: 'Authentication failed. Wrong password.' });
+                    return res.status(401).send({ message: 'Authentication failed. Wrong password.' });
                 }
                 let userInfo = setUserInfo(user);
                 return res.json({
